@@ -21,7 +21,7 @@ const userSchema = new Schema({
         trim:true,
         // index:true // email based searching kar lenge
     },
-    fullname:{
+    fullName:{
         type:String,
         required:true,
         trim:true,
