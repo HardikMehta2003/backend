@@ -3,7 +3,7 @@ import {ApiError} from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { uploadFileCloudinary } from "../utils/cloudinary.js";
-// import { isPasswordCorrect } from "../models/user.model.js";
+import fs from 'fs';
 import jwt from "jsonwebtoken";
 
 
@@ -252,7 +252,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
         throw new ApiError(400,"All fields are required");
     }
 
-    User.findByIdAndUpdate(
+    const user = await User.findByIdAndUpdate(
         req.user?._id,
         {
             $set:{
@@ -273,7 +273,7 @@ const updateAccountDetails = asyncHandler(async(req,res)=>{
 
 const updateUserAvatar = asyncHandler(async(req,res)=>{
     const avatarLocalPath = req.file?.path;
-
+    const deletePreviousAvatar = avatarLocalPath;
     if(!avatarLocalPath){
         throw new ApiError(400,"Avatar file is missing");
     }
@@ -296,6 +296,13 @@ const updateUserAvatar = asyncHandler(async(req,res)=>{
         }
     ).select("-password");
 
+    try {
+        fs.unlinkSync(deletePreviousAvatar);
+      
+        console.log("Delete File successfully.");
+      } catch (error) {
+        console.log(error);
+      }
     return res
     .status(200)
     .json(new ApiResponse(200,user,"Avatar updated successfully"))
@@ -339,6 +346,8 @@ export {
     logoutUser,
     refreshAccessToken,
     getCurrentUser,
+    updateAccountDetails,
     updateUserAvatar,
-    updateCoverImage
+    updateCoverImage,
+    changeCurrentPassword,
 }
