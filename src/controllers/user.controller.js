@@ -225,7 +225,7 @@ const refreshAccessToken = asyncHandler(async(req,res)=>{
 
 const changeCurrentPassword = asyncHandler(async(req,res)=>{
     const {oldPassword,newPassword} = req.body;
-    const user = await User.findById(user?._id);
+    const user = await User.findById(req.user?._id);
     const isPasswordCorrect = await user.isPasswordCorrect(oldPassword);
 
     if(!isPasswordCorrect){
@@ -236,10 +236,14 @@ const changeCurrentPassword = asyncHandler(async(req,res)=>{
     user.password = newPassword;
     user.save({validationBeforeSave: false});
 
+    return res
+    .status(200)
+    .json(new ApiResponse(200,{},"Password changed Successfully"))
 })
 
 
 const getCurrentUser = asyncHandler(async(req,res)=>{
+    console.log(req.user)
     return res
     .status(200)
     .json(200,req.user,"Current User fetched sucessfully");
@@ -344,7 +348,7 @@ const updateCoverImage = asyncHandler(async(req,res)=>{
 const getUserChannelProfile = asyncHandler(async(req,res)=>{
     const {username} = req.params
 
-    if(username?.trim()){
+    if(!username?.trim()){
         throw new ApiError(400,"username is missing");
     }
 
@@ -380,9 +384,9 @@ const getUserChannelProfile = asyncHandler(async(req,res)=>{
                 },
                 isSubcriped : {
                     $cond: {
-                        if:{$in:[req.user?._id,"$subcscribers.subscriber"]},
+                        if:{$in:[req.user?._id,"$subscribers.subscriber"]},
                         then:true,
-                        else: false
+                        else:false
                     }
                 }
             }
@@ -462,6 +466,8 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
     )
 
 })
+
+// const 
 
 export {
     registerUser,
