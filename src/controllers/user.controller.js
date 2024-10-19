@@ -435,14 +435,16 @@ const getWatchHistory = asyncHandler(async(req,res)=>{
                     {
                         $lookup:{
                             from:"users",
-                            localField:"owner",
+                            localField:'owner',
                             foreignField :"_id",
                             as:"owner",
                             pipeline:[
                                 {
-                                    fullName:1,
-                                    email:1,
-                                    avatar:1
+                                    $project:{
+                                        fullName:1,
+                                        username:1,
+                                        avatar:1
+                                    }
                                 },
                                 {
                                     $addFields:{
